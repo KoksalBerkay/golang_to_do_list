@@ -20,17 +20,27 @@ for (x = 0; x < close.length; x++) {
       div.classList.remove("checked");
       div.classList.toggle("deleted");
     }
-    else {
+    else if (div.classList.contains("not_checked")) {
+      div.classList.remove("not_checked");
       div.classList.toggle("deleted");
     }
   }
 }
 
+
 // Add a "checked" symbol when clicking on a list item
 var list = document.querySelector('ul');
 list.addEventListener('click', function(ev) {
   if (ev.target.tagName === 'LI') {
-    ev.target.classList.toggle('checked');
+
+    if (ev.target.classList.contains('not_checked')) { 
+      ev.target.classList.remove('not_checked');
+      ev.target.classList.toggle('checked');
+    }
+    else if (ev.target.classList.contains('checked')) {
+      ev.target.classList.remove('checked');
+      ev.target.classList.toggle('not_checked');
+    }
   }
 }, false);
 
@@ -43,6 +53,7 @@ function newElement() {
   if (inputValue === '') {
     alert("You must write something!");
   } else {
+    li.classList.toggle("not_checked");
     document.getElementById("myUL").appendChild(li);
   }
   document.getElementById("myInput").value = "";
@@ -57,6 +68,15 @@ function newElement() {
     close[x].onclick = function() {
       var div = this.parentElement;
       div.style.display = "none";
+
+      if (div.classList.contains("checked")) {
+        div.classList.remove("checked");
+        div.classList.toggle("deleted");
+      }
+      else if (div.classList.contains("not_checked")) {
+        div.classList.remove("not_checked");
+        div.classList.toggle("deleted");
+      }
     }
   }
 }
