@@ -87,7 +87,7 @@ func ConnectToDB() {
 
 	// insert a row
 	query := `insert into todos (task_name, task_status, id) values ($1, $2, $3)`
-	_, err = conn.Exec(query, "Study history", "done", a_id)
+	_, err = conn.Exec(query, "Study History", "checked", a_id)
 	if err != nil {
 		log.Fatal(err)
 	}
