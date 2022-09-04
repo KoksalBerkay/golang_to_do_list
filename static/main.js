@@ -16,6 +16,13 @@ for (x = 0; x < close.length; x++) {
   close[x].onclick = function() {
     var div = this.parentElement;
     div.style.display = "none";
+    if (div.classList.contains("checked")) {
+      div.classList.remove("checked");
+      div.classList.toggle("deleted");
+    }
+    else {
+      div.classList.toggle("deleted");
+    }
   }
 }
 
