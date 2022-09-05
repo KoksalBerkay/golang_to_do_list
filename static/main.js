@@ -19,11 +19,14 @@ for (x = 0; x < close.length; x++) {
     if (div.classList.contains("checked")) {
       div.classList.remove("checked");
       div.classList.toggle("deleted");
+      // store();
     }
     else if (div.classList.contains("not_checked")) {
       div.classList.remove("not_checked");
       div.classList.toggle("deleted");
+      // store();
     }
+    store();
   }
 }
 
@@ -36,12 +39,15 @@ list.addEventListener('click', function(ev) {
     if (ev.target.classList.contains('not_checked')) { 
       ev.target.classList.remove('not_checked');
       ev.target.classList.toggle('checked');
+      // store();
     }
     else if (ev.target.classList.contains('checked')) {
       ev.target.classList.remove('checked');
       ev.target.classList.toggle('not_checked');
+      // store();
     }
   }
+  store();
 }, false);
 
 // Create a new list item when clicking on the "Add" button
@@ -55,6 +61,7 @@ function newElement() {
   } else {
     li.classList.toggle("not_checked");
     document.getElementById("myUL").appendChild(li);
+    // store();
   }
   document.getElementById("myInput").value = "";
 
@@ -72,11 +79,37 @@ function newElement() {
       if (div.classList.contains("checked")) {
         div.classList.remove("checked");
         div.classList.toggle("deleted");
+        // store();
       }
       else if (div.classList.contains("not_checked")) {
         div.classList.remove("not_checked");
         div.classList.toggle("deleted");
+        // store();
       }
     }
   }
+  store();
 }
+
+
+function store() {
+  var list = document.querySelector('ul');
+  window.localStorage.myitems = list.innerHTML;
+}
+
+function getValues() {
+    var storedValues = window.localStorage.myitems;
+    if(!storedValues) {
+      list.innerHTML = '<li class="not_checked">Go to the school <span class="close">×</span> </li>'+
+                       '<li class="checked">Watch some youtube <span class="close">×</span> </li>'+
+                       '<li class="not_checked">Study math <span class="close">×</span> </li>'+
+                       '<li class="not_checked">Play Valorant <span class="close">×</span> </li>'+
+                       '<li class="not_checked">Write some code <span class="close">×</span> </li>'+
+                       '<li class="not_checked">Read a book <span class="close">×</span> </li>';
+    }
+    else {
+      list.innerHTML = storedValues;
+    }
+  }
+  
+getValues();
