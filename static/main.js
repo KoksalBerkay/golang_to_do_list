@@ -1,35 +1,26 @@
-// Create a "close" button and append it to each list item
-var myNodelist = document.getElementsByTagName("LI");
-var x;
-for (x = 0; x < myNodelist.length; x++) {
-  var span = document.createElement("SPAN");
-  var txt = document.createTextNode("\u00D7");
-  span.className = "close";
-  span.appendChild(txt);
-  myNodelist[x].appendChild(span);
-}
-
 // Click on a close button to hide the current list item
-var close = document.getElementsByClassName("close");
-var x;
-for (x = 0; x < close.length; x++) {
-  close[x].onclick = function() {
-    var div = this.parentElement;
-    div.style.display = "none";
-    if (div.classList.contains("checked")) {
-      div.classList.remove("checked");
-      div.classList.toggle("deleted");
-      // store();
+function CloseBTN () {
+  var close = document.getElementsByClassName("close");
+  var x;
+  for (x = 0; x < close.length; x++) {
+    close[x].onclick = function() {
+      var div = this.parentElement;
+      div.style.display = "none";
+      if (div.classList.contains("checked")) {
+        div.classList.remove("checked");
+        div.classList.toggle("deleted");
+        // store();
+      }
+      else if (div.classList.contains("not_checked")) {
+        div.classList.remove("not_checked");
+        div.classList.toggle("deleted");
+        // store();
+      }
     }
-    else if (div.classList.contains("not_checked")) {
-      div.classList.remove("not_checked");
-      div.classList.toggle("deleted");
-      // store();
-    }
-    store();
   }
 }
 
+window.onload = CloseBTN;
 
 // Add a "checked" symbol when clicking on a list item
 var list = document.querySelector('ul');
@@ -71,24 +62,7 @@ function newElement() {
   span.appendChild(txt);
   li.appendChild(span);
 
-  for (x = 0; x < close.length; x++) {
-    close[x].onclick = function() {
-      var div = this.parentElement;
-      div.style.display = "none";
-
-      if (div.classList.contains("checked")) {
-        div.classList.remove("checked");
-        div.classList.toggle("deleted");
-        // store();
-      }
-      else if (div.classList.contains("not_checked")) {
-        div.classList.remove("not_checked");
-        div.classList.toggle("deleted");
-        // store();
-      }
-    }
-  }
-  store();
+  CloseBTN();
 }
 
 
