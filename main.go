@@ -12,6 +12,8 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
+// It creates a file server that serves files from the directory "./static" and then it creates a
+// handler that serves the index.html file from the same directory
 func main() {
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
@@ -26,6 +28,7 @@ func main() {
 	}
 }
 
+// It takes a request, parses the template files, and writes the output to the response
 func serveTemplate(w http.ResponseWriter, r *http.Request) {
 	lp := filepath.Join("templates", "layout.html")
 	fp := filepath.Join("templates", filepath.Clean(r.URL.Path))
