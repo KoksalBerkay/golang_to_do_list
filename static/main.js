@@ -61,7 +61,7 @@ function newElement() {
   span.className = "close";
   span.appendChild(txt);
   li.appendChild(span);
-
+  store();
   CloseBTN();
 }
 
