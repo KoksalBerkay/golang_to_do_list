@@ -1,6 +1,8 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -17,7 +19,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", serveTemplate)
 
-	// ConnectToDB()
+	connectToDB()
 
 	log.Print("Listening on :8080...")
 	err := http.ListenAndServe(":8080", nil)
@@ -60,4 +62,99 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 		log.Print(err.Error())
 		http.Error(w, http.StatusText(500), 500)
 	}
+}
+
+// Creates a connection to the database
+func connectToDB() {
+	// connect to database
+	conn, err := sql.Open("pgx", "host=localhost port=5432 user=postgres password=12345 dbname=gotodo")
+	if err != nil {
+		log.Fatalf("Error opening database: %v\n", err)
+	}
+	defer conn.Close()
+
+	log.Println("Connected to database")
+
+	// test my connection
+	err = conn.Ping()
+	if err != nil {
+		log.Fatal("Cannot ping database!")
+	}
+
+	log.Println("Pinged database!")
+
+	// get rows from table
+	err = getAllRows(conn)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+// a_id is 1 more than the id of the last element
+var a_id int = 0
+
+// Prints all the rows in the table
+func getAllRows(conn *sql.DB) error {
+	rows, err := conn.Query("select id, task_name, task_status from todos")
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	defer rows.Close()
+
+	var taskName, taskStatus string
+	var id int
+
+	for rows.Next() {
+		err := rows.Scan(&id, &taskName, &taskStatus)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+		a_id = id + 1
+		fmt.Println("Record is", id, taskName, taskStatus)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Fatal("Error scanning rows:", err)
+	}
+
+	fmt.Println("-----------------------")
+	return nil
+}
+
+// It inserts to the database (Pay attention to the id)
+func insertToDB(conn *sql.DB) error {
+	query := `insert into todos (task_name, task_status, id) values ($1, $2, $3)`
+	_, err := conn.Exec(query, "Study math", "not_checked", a_id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Inserted a row!")
+	return nil
+}
+
+// Updates the row (Don't forget to change the id)
+func updateRow(conn *sql.DB) error {
+	query := `update todos set task_status = $1 where id = $2`
+	_, err := conn.Exec(query, "checked", 1)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Updated a row!")
+	return nil
+}
+
+// It deletes a row (Pay attention to the id)
+func deleteRow(conn *sql.DB) error {
+	query := `delete from todos where id = $1`
+	_, err := conn.Exec(query, (a_id - 1))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Deleted a row!")
+	return nil
 }

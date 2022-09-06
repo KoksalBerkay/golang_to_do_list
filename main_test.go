@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"net/http"
 	"testing"
 
@@ -30,6 +31,89 @@ func Test_serveTemplate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			serveTemplate(tt.args.w, tt.args.r)
+		})
+	}
+}
+
+func Test_connectToDB(t *testing.T) {
+	tests := []struct {
+		name string
+	}{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			connectToDB()
+		})
+	}
+}
+
+func Test_getAllRows(t *testing.T) {
+	type args struct {
+		conn *sql.DB
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := getAllRows(tt.args.conn); (err != nil) != tt.wantErr {
+				t.Errorf("getAllRows() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_insertToDB(t *testing.T) {
+	type args struct {
+		conn *sql.DB
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := insertToDB(tt.args.conn); (err != nil) != tt.wantErr {
+				t.Errorf("insertToDB() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_updateRow(t *testing.T) {
+	type args struct {
+		conn *sql.DB
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := updateRow(tt.args.conn); (err != nil) != tt.wantErr {
+				t.Errorf("updateRow() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_deleteRow(t *testing.T) {
+	type args struct {
+		conn *sql.DB
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := deleteRow(tt.args.conn); (err != nil) != tt.wantErr {
+				t.Errorf("deleteRow() error = %v, wantErr %v", err, tt.wantErr)
+			}
 		})
 	}
 }
