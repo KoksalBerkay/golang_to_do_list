@@ -65,10 +65,22 @@ function newElement() {
   CloseBTN();
 }
 
-
+var data;
 function store() {
+  // LOCAL STORAGE
   var list = document.querySelector('ul');
   window.localStorage.myitems = list.innerHTML;
+
+  // XML POST
+  for (var i = 0; i < list.children.length; i++) {
+    var item = list.children[i];
+    var data = {
+      "task": item.innerHTML.split("<span class=\"close\">×</span>")[0],
+      "status": item.className
+    };
+    console.log("JSON STRINGFY DATA" + JSON.stringify(data));
+    xmlPost('/receive', data);
+  }
 }
 
 function getValues() {
@@ -87,3 +99,17 @@ function getValues() {
   }
   
 getValues();
+
+function xmlPost(url, data) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+  xhr.addEventListener("load", reqListener);
+  console.log(xhr.responseText);
+  xhr.send(JSON.stringify(data));
+  console.log(JSON.stringify(data));
+}
+
+function reqListener () {
+  console.log(this.responseText);
+}

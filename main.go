@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -18,6 +19,7 @@ func main() {
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", serveTemplate)
+	http.HandleFunc("/receive", receiveAjax)
 
 	connectToDB()
 
@@ -157,4 +159,24 @@ func deleteRow(conn *sql.DB) error {
 
 	log.Println("Deleted a row!")
 	return nil
+}
+
+type Request struct {
+	TaskName   string `json:"task"`
+	TaskStatus string `json:"status"`
+}
+
+func receiveAjax(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		decoder := json.NewDecoder(r.Body)
+		req := Request{}
+		err := decoder.Decode(&req)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Print("\n Req: ", req, "\n")
+	}
+	// if r.Method == "GET" {
+	// 	fmt.Println("GET METHOD HAPPENED")
+	// }
 }
