@@ -168,6 +168,7 @@ type Request struct {
 
 func receiveAjax(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
+		// Receive the request
 		decoder := json.NewDecoder(r.Body)
 		req := Request{}
 		err := decoder.Decode(&req)
@@ -175,8 +176,21 @@ func receiveAjax(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 		fmt.Print("\n Req: ", req, "\n")
+
+		// Connect to database
+		conn, err := sql.Open("pgx", "host=localhost port=5432 user=postgres password=12345 dbname=gotodo")
+		if err != nil {
+			log.Fatalf("Error opening database: %v\n", err)
+		}
+		defer conn.Close()
+
+		// Insert to database
+		query := `insert into todos (task_name, task_status, id) values ($1, $2, $3)`
+		_, err = conn.Exec(query, req.TaskName, req.TaskStatus, a_id)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("Inserted a row!")
 	}
-	// if r.Method == "GET" {
-	// 	fmt.Println("GET METHOD HAPPENED")
-	// }
 }
