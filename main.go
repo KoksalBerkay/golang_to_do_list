@@ -20,6 +20,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", serveTemplate)
 	http.HandleFunc("/receive", receiveAjax)
+	http.HandleFunc("/todos", listTodos)
 
 	connectToDB()
 
@@ -27,6 +28,37 @@ func main() {
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func listTodos(w http.ResponseWriter, r *http.Request) {
+	conn, err := sql.Open("pgx", "host=localhost port=5432 user=postgres password=12345 dbname=gotodo")
+	if err != nil {
+		log.Fatalf("Error opening database: %v\n", err)
+	}
+	defer conn.Close()
+
+	rows, err := conn.Query("select id, task_name, task_status from todos")
+	if err != nil {
+		log.Println(err)
+	}
+	defer rows.Close()
+
+	var taskName, taskStatus string
+	var id int
+
+	for rows.Next() {
+		err := rows.Scan(&id, &taskName, &taskStatus)
+		if err != nil {
+			log.Println(err)
+		}
+		a_id = id + 1
+		req := Request{TaskName: taskName, TaskStatus: taskStatus}
+		json.NewEncoder(w).Encode(req)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Fatal("Error scanning rows:", err)
 	}
 }
 
