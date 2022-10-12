@@ -53,7 +53,7 @@ func listTodos(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 		a_id = id + 1
-		req := Request{TaskName: taskName, TaskStatus: taskStatus}
+		req := Request{TaskName: taskName, TaskStatus: taskStatus, Id: id}
 		json.NewEncoder(w).Encode(req)
 	}
 
@@ -157,47 +157,13 @@ func getAllRows(conn *sql.DB) error {
 	return nil
 }
 
-// It inserts to the database (Pay attention to the id)
-func insertToDB(conn *sql.DB) error {
-	query := `insert into todos (task_name, task_status, id) values ($1, $2, $3)`
-	_, err := conn.Exec(query, "Study math", "not_checked", a_id)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Inserted a row!")
-	return nil
-}
-
-// Updates the row (Don't forget to change the id)
-func updateRow(conn *sql.DB) error {
-	query := `update todos set task_status = $1 where id = $2`
-	_, err := conn.Exec(query, "checked", 1)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Updated a row!")
-	return nil
-}
-
-// It deletes a row (Pay attention to the id)
-func deleteRow(conn *sql.DB) error {
-	query := `delete from todos where id = $1`
-	_, err := conn.Exec(query, (a_id - 1))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("Deleted a row!")
-	return nil
-}
-
 type Request struct {
 	TaskName   string `json:"task"`
 	TaskStatus string `json:"status"`
+	Id         int    `json:"id"`
 }
 
+// receiveAjax receives the ajax request and sends the response to the database
 func receiveAjax(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		// Receive the request
@@ -218,11 +184,37 @@ func receiveAjax(w http.ResponseWriter, r *http.Request) {
 
 		// Insert to database
 		query := `insert into todos (task_name, task_status, id) values ($1, $2, $3)`
-		_, err = conn.Exec(query, req.TaskName, req.TaskStatus, a_id)
+		_, err = conn.Exec(query, req.TaskName, req.TaskStatus, req.Id)
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		log.Println("Inserted a row!")
+	}
+	if r.Method == "PUT" {
+		// Receive the request
+		decoder := json.NewDecoder(r.Body)
+		req := Request{}
+		err := decoder.Decode(&req)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Print("\n Req: ", req, "\n")
+
+		// Connect to database
+		conn, err := sql.Open("pgx", "host=localhost port=5432 user=postgres password=12345 dbname=gotodo")
+		if err != nil {
+			log.Fatalf("Error opening database: %v\n", err)
+		}
+		defer conn.Close()
+
+		// Update the row
+		query := `update todos set task_status = $1 where id = $2`
+		_, err = conn.Exec(query, req.TaskStatus, req.Id)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println("Updated a row!")
 	}
 }

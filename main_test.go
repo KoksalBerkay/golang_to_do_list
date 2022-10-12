@@ -64,56 +64,34 @@ func Test_getAllRows(t *testing.T) {
 	}
 }
 
-func Test_insertToDB(t *testing.T) {
+func Test_listTodos(t *testing.T) {
 	type args struct {
-		conn *sql.DB
+		w http.ResponseWriter
+		r *http.Request
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name string
+		args args
 	}{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := insertToDB(tt.args.conn); (err != nil) != tt.wantErr {
-				t.Errorf("insertToDB() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			listTodos(tt.args.w, tt.args.r)
 		})
 	}
 }
 
-func Test_updateRow(t *testing.T) {
+func Test_receiveAjax(t *testing.T) {
 	type args struct {
-		conn *sql.DB
+		w http.ResponseWriter
+		r *http.Request
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name string
+		args args
 	}{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := updateRow(tt.args.conn); (err != nil) != tt.wantErr {
-				t.Errorf("updateRow() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func Test_deleteRow(t *testing.T) {
-	type args struct {
-		conn *sql.DB
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := deleteRow(tt.args.conn); (err != nil) != tt.wantErr {
-				t.Errorf("deleteRow() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			receiveAjax(tt.args.w, tt.args.r)
 		})
 	}
 }
